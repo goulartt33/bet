@@ -3,6 +3,8 @@ from telegram import Bot
 import os
 from datetime import datetime
 import random
+import threading
+import time
 
 # =========================
 # Configuração do Telegram
@@ -23,12 +25,10 @@ def home():
 # =========================
 # Funções de geração de bilhetes
 # =========================
-
 def generate_football_bets():
-    # Aqui você pode colocar lógica real baseada em estatísticas
     teams = ["Flamengo", "Palmeiras", "Corinthians", "Santos"]
     bets = []
-    for _ in range(3):  # gera 3 bilhetes de exemplo
+    for _ in range(3):
         home = random.choice(teams)
         away = random.choice([t for t in teams if t != home])
         line = random.choice(["Over 1.5", "Under 2.5", "Ambas marcam"])
@@ -39,7 +39,7 @@ def generate_football_bets():
 def generate_basketball_bets():
     teams = ["Lakers", "Bulls", "Heat", "Celtics"]
     bets = []
-    for _ in range(2):  # gera 2 bilhetes de exemplo
+    for _ in range(2):
         home = random.choice(teams)
         away = random.choice([t for t in teams if t != home])
         line = random.choice(["Over 210.5", "Under 215.5"])
@@ -59,17 +59,29 @@ def send_bets():
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"{timestamp} | {bet}")
 
 # =========================
-# Rota para gerar bilhetes manualmente
+# Scheduler interno
+# =========================
+def scheduler(interval_minutes=30):
+    while True:
+        try:
+            send_bets()
+        except Exception as e:
+            print(f"Erro ao enviar bilhetes: {e}")
+        time.sleep(interval_minutes * 60)
+
+# Start scheduler em thread separada
+threading.Thread(target=scheduler, daemon=True).start()
+
+# =========================
+# Rota manual (opcional)
 # =========================
 @app.route("/run-bets")
 def run_bets():
     send_bets()
-    return "✅ Bilhetes enviados!"
+    return "✅ Bilhetes enviados manualmente!"
 
 # =========================
 # Main
 # =========================
 if __name__ == "__main__":
-    # Roda localmente se precisar
-    send_bets()  # envia ao iniciar
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
