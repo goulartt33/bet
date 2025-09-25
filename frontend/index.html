@@ -11,8 +11,8 @@
 
   <script>
     async function loadOdds() {
-      // 👉 Troque o link pelo que o Render gerar
-      const response = await fetch("https://SEU_BACKEND.onrender.com/odds");
+      // URL final do Render
+      const response = await fetch("https://bet-bot.onrender.com/odds");
       const data = await response.json();
       document.getElementById("output").innerText = JSON.stringify(data, null, 2);
     }
