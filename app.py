@@ -1,23 +1,24 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from football_analysis import generate_football_tickets
+from basketball_analysis import generate_basketball_tickets
 
 app = Flask(__name__)
-CORS(app)  # permite que qualquer frontend acesse a API
+CORS(app)
 
-@app.route("/")
+@app.route('/')
 def home():
-    return "✅ Bot de Apostas online no Render!"
+    return "📊 Bot de Apostas Online - Multi-Esporte"
 
-@app.route("/odds")
-def odds():
-    # Aqui você pode colocar os dados reais ou simulados
-    return jsonify({
-        "match": "Team A vs Team B",
-        "markets": [
-            {"type": "1x2", "odds": {"1": 2.1, "X": 3.2, "2": 3.5}},
-            {"type": "over/under", "odds": {"over 2.5": 1.9, "under 2.5": 1.95}}
-        ]
-    })
+@app.route('/tickets/football')
+def football_tickets():
+    tickets = generate_football_tickets()
+    return jsonify(tickets)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+@app.route('/tickets/basketball')
+def basketball_tickets():
+    tickets = generate_basketball_tickets()
+    return jsonify(tickets)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
